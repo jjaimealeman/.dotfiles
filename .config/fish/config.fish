@@ -1,8 +1,29 @@
 starship init fish | source
 
+# https://www.markhansen.co.nz/auto-start-tmux/
+# Adapted from https://github.com/fish-shell/fish-shell/issues/4434#issuecomment-332626369
+# only run in interactive (not automated SSH for example)
+if status is-interactive
+# don't nest inside another tmux
+and not set -q TMUX
+  # Adapted from https://unix.stackexchange.com/a/176885/347104
+  # Create session 'main' or attach to 'main' if already exists.
+  tmux new-session -A -s main
+end
 
+# EXTRACT is a function called from /functions/extract.fish
+alias ext extract
 alias v="nvim (fzf)"
+# LIST ALL
 alias ll="exa -la --icons --sort name --group-directories-first --git"
+# LIST ONLY DIRECTORIES
+alias ld="exa -lD --icons --sort name --git"
+# CD & LL 
+# cdls() { cd "$@" && ls; }
+# alias cdd="cd '$argv' && ll"
+function cdd --wraps "cd '$argv' && ll" --description "alias cdd=cd '$argv' && ll"
+    builtin cd $argv && ll
+end
 
 
 function neo --wraps 'neofetch && tuptime' --description 'alias neo=neofetch && tuptime'
@@ -42,4 +63,8 @@ export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 if status is-login
     set PATH ~/.npm-global/bin $PATH
 end
+
+# set PATH for this:
+# /home/jammo/Downloads/todo.txt-cli
+set PATH "$HOME/.local/bin:$PATH"
 
